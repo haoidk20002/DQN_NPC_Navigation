@@ -55,7 +55,7 @@ for i_episode in range(1, num_episodes+1):
         print("action shape", action.shape)
         # Convert action into the environment's expected format (discrete action)
         # action_tuple = (np.array([action]))
-        action_tuple = ActionTuple(continuous=action)
+        action_tuple = ActionTuple(discrete=action)
         #print("action tuple", action_tuple.shape)
         # Step the environment and receive the next state, reward, and done
         env.set_actions(behavior_name, action_tuple)
