@@ -5,13 +5,22 @@ from dqn_agent import Agent
 from mlagents_envs.environment import UnityEnvironment
 from mlagents_envs.base_env import ActionTuple
 # Step 1: Setting parameters
+# num_episodes (int): maximum number of training episodes
+# epsilon (float): starting value of epsilon, for epsilon-greedy action selection
+# epsilon_min (float): minimum value of epsilon
+# epsilon_decay (float): multiplicative factor (per episode) for decreasing epsilon
+# scores (float): list to record the scores obtained from each episode
+# scores_average_window (int): the window size employed for calculating the average score (e.g. 100)
+# solved_score (float): the average score required for the environment to be considered solved
+# (here we set the solved_score a little higher than 13 [i.e., 14] to ensure robust learning).
+
 num_episodes=1000
 epsilon=0.0
 epsilon_min=0.05
 epsilon_decay=0.99
 scores = []
-scores_average_window = 100      
-solved_score = 14  
+scores_average_window = 10      
+solved_score = 31  
 
 # Step 2: Starting the environment
 env = UnityEnvironment(file_name="Testing/DQN_NPC_Navigation_Unity.exe")
@@ -48,7 +57,7 @@ for i_episode in range(1, num_episodes+1):
     state = decision_steps.obs[0][0]  # Assuming single agent and single observation space
 
     score = 0
-
+    num = 0
     while True:
         # Agent takes an action (epsilon-greedy)
         action = agent.act(state, epsilon)
@@ -80,6 +89,9 @@ for i_episode in range(1, num_episodes+1):
         # Update state and score
         state = next_state
         score += reward
+        print(reward)
+        num += 1
+        print("num", num)
 
         if done:
             break
