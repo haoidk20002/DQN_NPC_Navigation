@@ -6,7 +6,7 @@ from mlagents_envs.environment import UnityEnvironment
 from mlagents_envs.base_env import ActionTuple
 # Step 1: Setting parameters
 num_episodes=1000
-epsilon=1.0
+epsilon=0.0
 epsilon_min=0.05
 epsilon_decay=0.99
 scores = []
@@ -26,7 +26,7 @@ behavior_spec = env.behavior_specs[behavior_name]
 
 # Step 4: Determine the size of the Action and State Spaces
 # Set the number of actions (action size)
-action_size = behavior_spec.action_spec.continuous_size  # or continuous_size depending on your environment
+action_size = behavior_spec.action_spec.discrete_branches[0]  # or continuous_size depending on your environment
 print("Action size",action_size)
 # Set the size of state observations (state size)
 state_size = behavior_spec.observation_specs[0].shape[0]  # Assuming there is one observation, otherwise adjust index
@@ -52,10 +52,10 @@ for i_episode in range(1, num_episodes+1):
     while True:
         # Agent takes an action (epsilon-greedy)
         action = agent.act(state, epsilon)
-        print("action shape", action.shape)
+        print (action)
         # Convert action into the environment's expected format (discrete action)
         # action_tuple = (np.array([action]))
-        action_tuple = ActionTuple(continuous=action)
+        action_tuple = ActionTuple(discrete=action)
         #print("action tuple", action_tuple.shape)
         # Step the environment and receive the next state, reward, and done
         env.set_actions(behavior_name, action_tuple)

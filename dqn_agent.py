@@ -116,12 +116,12 @@ class Agent():
 
         # Epsilon-greedy action selection
         if random.random() > eps:
-            return np.argmax(action_values.cpu().data.numpy())
+            return np.argmax(action_values.cpu().data.numpy()).reshape(1, 1)
         else:
             #return random.choice(np.arange(self.action_size)) (old)
-            action = np.random.uniform(low=-1.0, high=1.0, size=self.action_size)
-            print(f"Initial action shape: {action.shape}")
-            return action.reshape((1, self.action_size))
+            action = np.random.randint(0, 3, size=(1,1))
+
+            return action
 
 
 	########################################################
