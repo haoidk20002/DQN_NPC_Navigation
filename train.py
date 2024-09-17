@@ -15,9 +15,9 @@ from mlagents_envs.base_env import ActionTuple
 # (here we set the solved_score a little higher than 13 [i.e., 14] to ensure robust learning).
 
 num_episodes=1000
-epsilon=0.0
-epsilon_min=0.05
-epsilon_decay=0.99
+epsilon=1.0
+epsilon_min=0.1
+epsilon_decay=0.995
 scores = []
 scores_average_window = 10      
 solved_score = 31  
@@ -61,7 +61,7 @@ for i_episode in range(1, num_episodes+1):
     while True:
         # Agent takes an action (epsilon-greedy)
         action = agent.act(state, epsilon)
-        print (action)
+        print ("Action number" ,action)
         # Convert action into the environment's expected format (discrete action)
         # action_tuple = (np.array([action]))
         action_tuple = ActionTuple(discrete=action)
@@ -72,7 +72,7 @@ for i_episode in range(1, num_episodes+1):
 
         # Get new environment info
         decision_steps, terminal_steps = env.get_steps(behavior_name)
-
+        #print("new terminal step: ",terminal_steps)
         # Check if agent is in terminal step (done)
         if len(terminal_steps) > 0:
             next_state = terminal_steps.obs[0][0]
@@ -91,7 +91,7 @@ for i_episode in range(1, num_episodes+1):
         score += reward
         print(reward)
         num += 1
-        print("num", num)
+        print("num of steps: ", num)
 
         if done:
             break
