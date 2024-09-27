@@ -119,7 +119,7 @@ class Agent():
             return np.argmax(action_values.cpu().data.numpy()).reshape(1, 1)
         else:
             #return random.choice(np.arange(self.action_size)) (old)
-            action = np.random.randint(1, 5, size=(1,1))
+            action = np.random.randint(0, 5, size=(1,1))
 
             return action
 

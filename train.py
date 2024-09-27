@@ -4,6 +4,7 @@ import numpy as np
 from dqn_agent import Agent
 from mlagents_envs.environment import UnityEnvironment
 from mlagents_envs.base_env import ActionTuple
+from tqdm import tqdm
 # Step 1: Setting parameters
 # num_episodes (int): maximum number of training episodes
 # epsilon (float): starting value of epsilon, for epsilon-greedy action selection
@@ -20,7 +21,7 @@ epsilon_min=0.1
 epsilon_decay=0.995
 scores = []
 scores_average_window = 10      
-solved_score = 31  
+solved_score = 6000  
 
 # Step 2: Starting the environment
 env = UnityEnvironment(file_name="Testing/DQN_NPC_Navigation_Unity.exe")
@@ -44,15 +45,16 @@ state_size = behavior_spec.observation_specs[0].shape[0]  # Assuming there is on
 # Step 5: Initialize a DQN Agent from the Agent Class in dqn_agent.py
 agent = Agent(state_size=state_size, action_size=action_size, dqn_type='DQN')
 
+progress = tqdm(range(1, num_episodes+1), total= num_episodes)
 
 # Step 6: Play the environment for specified number of episodes
-for i_episode in range(1, num_episodes+1):
+for i_episode in progress:
     # Reset the environment
-    print ("Training " , i_episode)
+    # print ("Training " , i_episode)
     env.reset()
     decision_steps, terminal_steps = env.get_steps(behavior_name)
-    print("decision step: ", decision_steps)
-    print("terminal step: ", terminal_steps)
+    # print("decision step: ", decision_steps)
+    # print("terminal step: ", terminal_steps)
     # Get initial state
     state = decision_steps.obs[0][0]  # Assuming single agent and single observation space
 
@@ -61,7 +63,7 @@ for i_episode in range(1, num_episodes+1):
     while True:
         # Agent takes an action (epsilon-greedy)
         action = agent.act(state, epsilon)
-        print ("Action number" ,action)
+        # print (action)
         # Convert action into the environment's expected format (discrete action)
         # action_tuple = (np.array([action]))
         action_tuple = ActionTuple(discrete=action)
@@ -89,13 +91,15 @@ for i_episode in range(1, num_episodes+1):
         # Update state and score
         state = next_state
         score += reward
-        print(reward)
+        # print(reward)
         num += 1
-        print("num of steps: ", num)
+        # print("num of steps: ", num)
+
+        progress.set_description(f"reward: {reward}, step: {num}")
 
         if done:
             break
-
+    
     # Record score and calculate average score over the window
     scores.append(score)
     average_score = np.mean(scores[-scores_average_window:])
@@ -104,24 +108,24 @@ for i_episode in range(1, num_episodes+1):
     epsilon = max(epsilon_min, epsilon_decay * epsilon)
 
     # Print current episode and average score
-    print(f'\rEpisode {i_episode}\tAverage Score: {average_score:.2f}', end="")
+    print(fr'\rEpisode {i_episode}\tAverage Score: {average_score:.2f}\tEpsilon: {epsilon}', end="")
 
     # Print average score every scores_average_window episodes
     if i_episode % scores_average_window == 0:
-        print(f'\rEpisode {i_episode}\tAverage Score: {average_score:.2f}')
+        print(fr'\rEpisode {i_episode}\tAverage Score: {average_score:.2f}')
 
     # Check if the environment is solved
     if average_score >= solved_score:
-        print(f'\nEnvironment solved in {i_episode} episodes!\tAverage Score: {average_score:.2f}')
+        print(fr'\nEnvironment solved in {i_episode} episodes!\tAverage Score: {average_score:.2f}')
         
         # Save trained network weights
-        timestr = time.strftime("%Y%m%d-%H%M%S")
-        nn_filename = "dqnAgent_Trained_Model_" + timestr + ".pth"
-        torch.save(agent.network.state_dict(), nn_filename)
+        # timestr = time.strftime("%Y%m%d-%H%M%S")
+        # nn_filename = "dqnAgent_Trained_Model_" + timestr + ".pth"
+        # torch.save(agent.network.state_dict(), nn_filename)
         
         # Save scores data
-        scores_filename = "dqnAgent_scores_" + timestr + ".csv"
-        np.savetxt(scores_filename, scores, delimiter=",")
+        # scores_filename = "dqnAgent_scores_" + timestr + ".csv"
+        # np.savetxt(scores_filename, scores, delimiter=",")
         break
 
 # Step 7: Close the Environment
