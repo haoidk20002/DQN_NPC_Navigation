@@ -117,15 +117,7 @@ for i_episode in progress:
     # Check if the environment is solved
     if average_score >= solved_score:
         print(fr'\nEnvironment solved in {i_episode} episodes!\tAverage Score: {average_score:.2f}')
-        
-        # Save trained network weights
-        # timestr = time.strftime("%Y%m%d-%H%M%S")
-        # nn_filename = "dqnAgent_Trained_Model_" + timestr + ".pth"
-        # torch.save(agent.network.state_dict(), nn_filename)
-        
-        # Save scores data
-        # scores_filename = "dqnAgent_scores_" + timestr + ".csv"
-        # np.savetxt(scores_filename, scores, delimiter=",")
+        torch.save(agent.network.state_dict(), 'dqnAgent_Trained_Model.pth')
         break
 
 # Step 7: Close the Environment
