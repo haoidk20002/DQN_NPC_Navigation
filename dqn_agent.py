@@ -21,7 +21,7 @@ from replay_memory import ReplayBuffer
 
 # Determine if CPU or GPU computation should be used
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
+print(f"Using device: {device}")
 
 """
 ##################################################
@@ -37,8 +37,8 @@ class Agent():
         Local and Targat State-Action Policy Networks
         Replay Memory Buffer from Replay Buffer Class (define below)
     """
-    def __init__(self, state_size, action_size, dqn_type='DQN', replay_memory_size=1e5, batch_size=64, gamma=0.99,
-    	learning_rate=1e-3, target_tau=2e-3, update_rate=4, seed=0):
+    def __init__(self, state_size, action_size, dqn_type='DQN', replay_memory_size=1e5, batch_size=128, gamma=0.95,
+    	learning_rate=1e-2, target_tau=2e-3, update_rate=5, seed=0):
         
         """
         DQN Agent Parameters
@@ -48,7 +48,7 @@ class Agent():
             dqn_type (string): can be either 'DQN' for vanillia dqn learning (default) or 'DDQN' for double-DQN.
             replay_memory size (int): size of the replay memory buffer (typically 5e4 to 5e6)
             batch_size (int): size of the memory batch used for model updates (typically 32, 64 or 128)
-            gamma (float): paramete for setting the discoun ted value of future rewards (typically .95 to .995)
+            gamma (float): paramete for setting the discounted value of future rewards (typically .95 to .995)
             learning_rate (float): specifies the rate of model learing (typically 1e-4 to 1e-3))
             seed (int): random seed for initializing training point.
         """
