@@ -15,12 +15,13 @@ import matplotlib.pyplot as plt
 # solved_score (float): the average score required for the environment to be considered solved
 
 num_episodes=1000
-epsilon=1.0
+epsilon=0.5
 epsilon_min=0.1
-epsilon_decay=0.99
+epsilon_decay=0.8
 scores = []
 scores_average_window = 5     
 solved_score = 5000
+decision_step_interval = 5 
 # 4400 + 850 = 5250 => Avg approx 5250
 
 # Step 2: Starting the environment
@@ -49,23 +50,18 @@ progress = tqdm(range(1, num_episodes+1), total= num_episodes)
 # Step 6: Play the environment for specified number of episodes
 try:
     for i_episode in progress:
-        # Reset the environment (may not need)
-        # env.reset()
         decision_steps, terminal_steps = env.get_steps(behavior_name)
 
         # Get initial state
-        state = decision_steps.obs[0][0]  
-
+        state = decision_steps.obs[0][0]
         score = 0
-        num = 0
-        while True:
+        accumulated_reward = 0
+        step_count = 0
+        while True: # Loop frequency: every decision (decision every 5 steps)
             # Agent takes an action (epsilon-greedy)
             action = agent.act(state, epsilon)
-            # print (action)
             # Convert action into the environment's expected format (discrete action)
-            # action_tuple = (np.array([action]))
             action_tuple = ActionTuple(discrete=action)
-            #print("action tuple", action_tuple.shape)
 
             # Step the environment and receive the next state, reward, and done
             env.set_actions(behavior_name, action_tuple)
@@ -73,7 +69,7 @@ try:
 
             # Get new environment info
             decision_steps, terminal_steps = env.get_steps(behavior_name)
-            #print("new terminal step: ",terminal_steps)
+
             # Check if agent is in terminal step (done)
             if len(terminal_steps) > 0:
                 next_state = terminal_steps.obs[0][0]
@@ -84,20 +80,25 @@ try:
                 reward = decision_steps.reward[0]
                 done = False
 
-            # Send (S, A, R, S') to the agent and update the agent's network
-            agent.step(state, action, reward, next_state, done)
-
-            # Update state and score
-            state = next_state
+            # Accumulate reward
+            accumulated_reward += reward
             score += reward
-            if (score < 0):
+            if score < 0:
+                # Clamp the score to be within the range [0, 100000000]
                 score = max(0, min(score, 100000000))
-            # print(reward)
-            num += 1
-            # print("num of steps: ", num)
+            step_count += 1
+            #print("Step: ",step_count)
+            progress.set_description(f"Reward: {reward:.2f}, Step: {step_count}, Score: {score:.2f}")
+            # Update state and score every decision_step_interval steps
+            if step_count % decision_step_interval == 0 or done:
+                # Send (S, A, R, S') to the agent and update the agent's network
+                agent.step(state, action, accumulated_reward, next_state, done)
+                # Update state and score
+                state = next_state
+                accumulated_reward = 0  # Reset accumulated reward
 
-            progress.set_description(f"Reward: {reward}, Step: {num}, Score: {score:.2f}")
 
+            # Check if the episode is done
             if done:
                 break
         
