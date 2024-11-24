@@ -80,6 +80,8 @@ class Agent():
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
 
+        self.last_action = np.random.randint(0, 5, size=(1,1))
+
 
     ########################################################
     # STEP() method
@@ -116,12 +118,17 @@ class Agent():
 
         # Epsilon-greedy action selection
         if random.random() > eps:
-            return np.argmax(action_values.cpu().data.numpy()).reshape(1, 1)
+            return np.argmax(action_values.cpu().data.numpy()).reshape(1, 1), True
         else:
+            # pls change the rate according to env and the current situation of the agent
             #return random.choice(np.arange(self.action_size)) (old)
-            action = np.random.randint(0, 5, size=(1,1))
-
-            return action
+            # action = np.random.randint(0, self.action_size, size=(1,1))
+            action = np.random.choice(self.action_size, size=(1,1), p=[0.05, 0.15, 0.15, 0.65])
+            self.last_action = action
+            return action, False
+        
+    def last_act(self):
+        return self.last_action
 
 
 	########################################################
