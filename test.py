@@ -5,7 +5,7 @@ from mlagents_envs.environment import UnityEnvironment
 from mlagents_envs.base_env import ActionTuple
 
 # Step 1: Get env 
-env = UnityEnvironment(file_name="Testing/DQN_NPC_Navigation_Unity.exe")
+env = UnityEnvironment(file_name="testing/v2/DQN_NPC_Navigation_Unity.exe")
 env.reset()
 
 # Step 2: Get The Unity Environment Behavior
@@ -20,15 +20,13 @@ print("Action size",action_size)
 state_size = behavior_spec.observation_specs[0].shape[0]  # Assuming there is one observation, otherwise adjust index
 print( "State size",state_size)
 
-#Initialize Agent
+#Step 4: Initialize Agent and load trained model weights
 agent = Agent(state_size=state_size, action_size=action_size)
-
-# Load trained model weights
-agent.network.load_state_dict(torch.load('dqnAgent_Trained_Model_140.pth'))
+agent.network.load_state_dict(torch.load('best_model/dqnAgent_Trained_Model_81.pth'))
 agent.network.eval()
 
 
-# Step 4: Interact with the environment
+# Step 5: Interact with the environment
 env.reset()
 decision_steps, terminal_steps = env.get_steps(behavior_name)
 
@@ -36,7 +34,7 @@ while len(terminal_steps) == 0:  # Run until the episode ends
     # Get the current state
     state = decision_steps.obs[0][0]  # Assuming one agent and one observation
     # Select action using the trained agent
-    action,determined = agent.act(state, eps=0.0)  # eps=0 for a fully greedy policy
+    action,determined = agent.act(state, eps=0.00)  # eps=0 for a fully greedy policy
     print(action)
     # Convert the action to ActionTuple and send it to the environment
     action_tuple = ActionTuple(discrete=action)
@@ -50,6 +48,5 @@ while len(terminal_steps) == 0:  # Run until the episode ends
 
     if len(terminal_steps) > 0:
         print("Episode finished!")
-
-# Close the environment
+# Step 6: Close the environment
 env.close()

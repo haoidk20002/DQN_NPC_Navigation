@@ -1,0 +1,11 @@
+v1 reward:
+To target: 10
+Not to target: -0.05
+Hit wall: -0.75
+Return to old pos: -0.25
+
+v2 reward:
+To target: 1000
+Not to target: 1
+Hit wall: 0
+Return to old pos: 0
