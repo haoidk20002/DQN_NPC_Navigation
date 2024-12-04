@@ -101,7 +101,7 @@ for i_episode in progress:
     epsilon = max(epsilon_min, epsilon_decay * epsilon)
     # Save model every 5 episodes
     if reached_goal == True or i_episode % 5 == 0:
-        torch.save(agent.network.state_dict(), f'dqnAgent_Trained_Model_{i_episode}.pth')
+        torch.save(agent.network.state_dict(), f'saved_model/dqnAgent_Trained_Model_{i_episode}.pth')
 
 # Step 7: Close the Environment
 env.close()
